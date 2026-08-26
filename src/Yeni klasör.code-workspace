@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "../../../../../Desktop/Yeni klasör"
+		},
+		{
+			"name": "esp32-server-sender",
+			"path": ".."
+		}
+	],
+	"settings": {}
+}
