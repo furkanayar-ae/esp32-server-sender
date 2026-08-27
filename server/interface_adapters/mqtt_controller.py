@@ -2,8 +2,9 @@ import json
 from server.use_cases.handle_production import ProcessProductionDataUseCase
 
 class MQTTController:
-    def __init__(self):
-        self.use_case = ProcessProductionDataUseCase()
+    def __init__(self, database):
+        # Database nesnesini Use Case'e iletiyoruz
+        self.use_case = ProcessProductionDataUseCase(database=database)
 
     def handle_message(self, topic: str, payload_bytes: bytes):
         try:
