@@ -1,25 +1,32 @@
-import json
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from server.interface_adapters.http_controller import SensorController
+import time
+import paho.mqtt.client as mqtt
+from server.interface_adapters.mqtt_controller import MQTTController
 
-controller = SensorController()
+# Public / Yerel test MQTT Broker adresi
+MQTT_BROKER = "test.mosquitto.org"
+MQTT_PORT = 1883
+MQTT_TOPIC = "fabrika/uretim/istasyon_1"
 
-class CleanHTTPHandler(BaseHTTPRequestHandler):
-    def do_POST(self):
-        content_length = int(self.headers['Content-Length'])
-        post_data = self.rfile.read(content_length)
-        
-        # Controller'a yönlendir
-        response_dict = controller.handle_post_request(post_data)
-        
-        # HTTP yanıtını dön
-        self.send_response(200)
-        self.send_header('Content-Type', 'application/json')
-        self.end_headers()
-        self.wfile.write(json.dumps(response_dict).encode('utf-8'))
+controller = MQTTController()
+
+def on_connect(client, userdata, flags, rc):
+    if rc == 0:
+        print(f"✅ MQTT Broker'a bağlandı ({MQTT_BROKER})")
+        client.subscribe(MQTT_TOPIC)
+        print(f"📡 Dinleniyor: {MQTT_TOPIC}")
+    else:
+        print(f"❌ Bağlantı başarısız! Hata kodu: {rc}")
+
+def on_message(client, userdata, msg):
+    controller.handle_message(msg.topic, msg.payload)
 
 if __name__ == "__main__":
-    server_address = ('', 3000)
-    httpd = HTTPServer(server_address, CleanHTTPHandler)
-    print("Clean Architecture Python Sunucusu Port 3000'de başlatıldı...")
-    httpd.serve_forever()
+    client = mqtt.Client()
+    client.on_connect = on_connect
+    client.on_message = on_message
+
+    print("🚀 MES & MQTT Sunucusu Başlatılıyor...")
+    client.connect(MQTT_BROKER, MQTT_PORT, 60)
+    
+    # Sürekli dinlemede kal
+    client.loop_forever()

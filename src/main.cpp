@@ -1,49 +1,80 @@
 #include <WiFi.h>
-#include <HTTPClient.h>
+#include <PubSubClient.h>
+#include <ArduinoJson.h>
 
-// Telefonunun veya kullandığın ağın Wi-Fi adı ve şifresi
+// Wi-Fi Bilgileri
 const char* ssid = "iPhone 15 pro";
 const char* password = "furk4nn12";
 
-// Bilgisayarının IP adresi ve Python sunucusunun portu
-const char* serverName = "http://172.20.10.14:3000"; 
+// MQTT Broker Bilgileri (Sunucumuzun dinlediği broker)
+const char* mqtt_server = "test.mosquitto.org";
+const int mqtt_port = 1883;
+const char* mqtt_topic = "fabrika/uretim/istasyon_1";
 
-unsigned long lastTime = 0;
-unsigned long timerDelay = 5000; // Her 5 saniyede bir veri gönder
+WiFiClient espClient;
+PubSubClient client(espClient);
 
-void setup() {
-  Serial.begin(115200);
-
-  WiFi.begin(ssid, password);
+void setup_wifi() {
+  delay(10);
   Serial.println("Wi-Fi'a bağlanılıyor...");
+  WiFi.begin(ssid, password);
+
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
   }
-  Serial.println("\nWi-Fi bağlandı!");
+
+  Serial.println("\nWi-Fi bağlandı! IP adresi: ");
+  Serial.println(WiFi.localIP());
 }
 
-void loop() {
-  if ((millis() - lastTime) > timerDelay) {
-    if (WiFi.status() == WL_CONNECTED) {
-      HTTPClient http;
-
-      http.begin(serverName);
-      http.addHeader("Content-Type", "application/json");
-
-      // Gönderilecek örnek veri
-      String httpRequestData = "{\"sensor_id\": \"esp32_dev_kit\", \"temperature\": 24.5}";
-
-      int httpResponseCode = http.POST(httpRequestData);
-
-      Serial.print("HTTP Yanıt kodu: ");
-      Serial.println(httpResponseCode);
-
-      http.end();
+void reconnect() {
+  while (!client.connected()) {
+    Serial.print("MQTT Broker'a bağlanılıyor...");
+    // Benzersiz bir client ID oluşturuyoruz
+    if (client.connect("ESP32_MES_Station_01")) {
+      Serial.println(" BAĞLANDI!");
     } else {
-      Serial.println("Wi-Fi bağlantısı kopuk!");
+      Serial.print(" başarısız, rc=");
+      Serial.print(client.state());
+      Serial.println(" 5 saniye sonra tekrar denenecek...");
+      delay(5000);
     }
-    
-    lastTime = millis();
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+  setup_wifi();
+  client.setServer(mqtt_server, mqtt_port);
+}
+
+unsigned long lastMsg = 0;
+
+void loop() {
+  if (!client.connected()) {
+    reconnect();
+  }
+  client.loop();
+
+  unsigned long now = millis();
+  // Her 5 saniyede bir MES verisi fırlat
+  if (now - lastMsg > 5000) {
+    lastMsg = now;
+
+    // JSON Veri Paketi Oluşturma (MES Standardı)
+    StaticJsonDocument<200> doc;
+    doc["station_id"] = "STATION_01";
+    doc["product_id"] = "PRD-2026-99";
+    doc["operator_id"] = "OP_FURKAN_07";
+    doc["temperature"] = 38.4;
+    doc["status"] = "processing";
+
+    char jsonBuffer[256];
+    serializeJson(doc, jsonBuffer);
+
+    // MQTT Topic'ine gönder (Publish)
+    client.publish(mqtt_topic, jsonBuffer);
+    Serial.println("MES Verisi MQTT üzerinden gönderildi: " + String(jsonBuffer));
   }
 }
