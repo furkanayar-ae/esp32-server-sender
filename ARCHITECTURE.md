@@ -446,4 +446,3 @@ flowchart LR
     Domain --> MES
 ```
 
-Bu mimari, cihaz haberleşmesini iş kurallarından ayırarak sistemin test edilebilir, geliştirilebilir ve sürdürülebilir olmasını sağlar. MQTT veya MES çıktı sistemi gelecekte değiştirilse bile Domain modeli ve temel üretim kuralları korunabilir.
