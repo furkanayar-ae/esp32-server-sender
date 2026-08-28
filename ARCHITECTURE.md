@@ -103,9 +103,7 @@ sequenceDiagram
 
 Bu doküman, Manufacturing Execution System (MES) projesinin Clean Architecture prensiplerine dayalı mimari yapısını ve akış senaryolarını özetler.
 
-## Sistem Use Case Diyagramı
-
-Aşağıdaki şema, PlantUML formatında tasarlanmış olup sistemdeki IoT cihazları, kullanıcılar ve arka uç bileşenleri arasındaki temel etkileşimleri göstermektedir:
+## 3. Kullanım Senaryosu Diyagramı
 
 ```plantuml
 @startuml
@@ -129,43 +127,6 @@ UC2 --> UC3
 UC3 --> UC4
 UC4 ..> UC5 : Veri Kalıcılığı
 @enduml
-
-## 3. Kullanım Senaryosu Diyagramı
-
-```mermaid
-flowchart LR
-    Operator(("Operatör / İstasyon"))
-    ESP32Device(("ESP32 Donanımı"))
-    Developer(("Geliştirici"))
-
-    subgraph SystemBoundary["MES / IoT Üretim Takip Sistemi"]
-        UC1["Telemetri verisini yayınla"]
-        UC2["MQTT mesajlarını dinle"]
-        UC3["Üretim verisini doğrula"]
-        UC4["Domain modeline dönüştür"]
-        UC5["MES log paneline aktar"]
-        UC6["Kod ve mimariyi yönet"]
-    end
-
-    Broker["MQTT Broker"]
-    Backend["Python Backend"]
-    Repository["GitHub Repository"]
-
-    Operator --> UC1
-    ESP32Device --> UC1
-
-    UC1 -->|"MQTT Publish"| Broker
-    Broker -->|"MQTT Subscribe"| Backend
-
-    Backend --> UC2
-    UC2 --> UC3
-    UC3 --> UC4
-    UC4 --> UC5
-
-    Developer --> UC6
-    UC6 --> Repository
-```
-
 ---
 
 ## 4. Uçtan Uca İş Akışı
