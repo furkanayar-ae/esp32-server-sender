@@ -418,4 +418,10 @@ flowchart LR
     UseCase --> Domain
     Domain --> MES
 ```
+## ER Diyagramı (Varlık İlişki Şeması)
+
+Aşağıdaki şema, sistemdeki `Station`, `Operator`, `Product` varlıkları ile log kayıtlarını tutan `ProductionLog` tablosu arasındaki ilişkileri göstermektedir:
+
+![ER Diyagramı](docs/images/er_diagram.png)
+---
 
