@@ -99,6 +99,37 @@ sequenceDiagram
 
 ---
 
+# MES Backend - Sistem Mimarisi ve Kullanım Senaryoları
+
+Bu doküman, Manufacturing Execution System (MES) projesinin Clean Architecture prensiplerine dayalı mimari yapısını ve akış senaryolarını özetler.
+
+## Sistem Use Case Diyagramı
+
+Aşağıdaki şema, PlantUML formatında tasarlanmış olup sistemdeki IoT cihazları, kullanıcılar ve arka uç bileşenleri arasındaki temel etkileşimleri göstermektedir:
+
+```plantuml
+@startuml
+left to right direction
+
+actor "Kayıtlı Kullanıcı / Operatör" as Operator
+actor "ESP32 Cihazı" as ESP32
+
+rectangle "MES Arka Uç Sistemi" {
+    usecase "MQTT Verisi Gönder" as UC1
+    usecase "MQTT Mesajını Yakala\n(MQTTController)" as UC2
+    usecase "İş Mantığını İşle\n(ProcessProductionDataUseCase)" as UC3
+    usecase "Veritabanına Kaydet\n(LocalDatabase / SQLite)" as UC4
+    usecase "Üretim Loglarını Görüntüle" as UC5
+}
+
+Operator --> UC5
+ESP32 --> UC1
+UC1 --> UC2
+UC2 --> UC3
+UC3 --> UC4
+UC4 ..> UC5 : Veri Kalıcılığı
+@enduml
+
 ## 3. Kullanım Senaryosu Diyagramı
 
 ```mermaid
