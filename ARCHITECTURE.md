@@ -105,6 +105,8 @@ Bu doküman, Manufacturing Execution System (MES) projesinin Clean Architecture 
 
 ## 3. Kullanım Senaryosu Diyagramı
 
+### PlantUML
+
 ```plantuml
 @startuml
 left to right direction
@@ -113,6 +115,7 @@ actor "Kayıtlı Kullanıcı / Operatör" as Operator
 actor "ESP32 Cihazı" as ESP32
 
 rectangle "MES Arka Uç Sistemi" {
+
     usecase "MQTT Verisi Gönder" as UC1
     usecase "MQTT Mesajını Yakala\n(MQTTController)" as UC2
     usecase "İş Mantığını İşle\n(ProcessProductionDataUseCase)" as UC3
@@ -126,13 +129,19 @@ UC1 --> UC2
 UC2 --> UC3
 UC3 --> UC4
 UC4 ..> UC5 : Veri Kalıcılığı
+
 @enduml
+```
+
+> **Not:** GitHub, `plantuml` kod bloklarını kendiliğinden diyagram olarak render etmez. PlantUML diyagramını göstermek için GitHub Actions, harici bir PlantUML render servisi veya oluşturulmuş PNG/SVG dosyası kullanmak gerekir.
+
 ---
 
 ## 4. Uçtan Uca İş Akışı
 
 ```mermaid
 flowchart TD
+
     Start(["Başlangıç<br/>İstasyon tetiklendi"])
 
     ReadSensor["ESP32 sensörleri okur<br/>Sıcaklık, durum ve üretim bilgileri"]
@@ -173,7 +182,6 @@ flowchart TD
     OutputLog --> End
 ```
 
----
 
 ## 5. Clean Architecture Katmanları
 
