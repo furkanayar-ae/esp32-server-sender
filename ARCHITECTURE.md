@@ -105,36 +105,9 @@ Bu doküman, Manufacturing Execution System (MES) projesinin Clean Architecture 
 
 ## 3. Kullanım Senaryosu Diyagramı
 
-### PlantUML
+Aşağıdaki şema, ESP32 cihazı ve operatörün sistemle nasıl etkileşime girdiğini ve verinin hangi aşamalardan geçerek kalıcı hale geldiğini (Veri Kalıcılığı) göstermektedir:
 
-```plantuml
-@startuml
-left to right direction
-
-actor "Kayıtlı Kullanıcı / Operatör" as Operator
-actor "ESP32 Cihazı" as ESP32
-
-rectangle "MES Arka Uç Sistemi" {
-
-    usecase "MQTT Verisi Gönder" as UC1
-    usecase "MQTT Mesajını Yakala\n(MQTTController)" as UC2
-    usecase "İş Mantığını İşle\n(ProcessProductionDataUseCase)" as UC3
-    usecase "Veritabanına Kaydet\n(LocalDatabase / SQLite)" as UC4
-    usecase "Üretim Loglarını Görüntüle" as UC5
-}
-
-Operator --> UC5
-ESP32 --> UC1
-UC1 --> UC2
-UC2 --> UC3
-UC3 --> UC4
-UC4 ..> UC5 : Veri Kalıcılığı
-
-@enduml
-```
-
-> **Not:** GitHub, `plantuml` kod bloklarını kendiliğinden diyagram olarak render etmez. PlantUML diyagramını göstermek için GitHub Actions, harici bir PlantUML render servisi veya oluşturulmuş PNG/SVG dosyası kullanmak gerekir.
-
+![Use Case Diyagramı](docs/images/use_case_diagram.png)
 ---
 
 ## 4. Uçtan Uca İş Akışı
